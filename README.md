@@ -1,12 +1,12 @@
 # Virtual Agent
 
 ## Indice:
-* [Descrição do Projeto:](descricao-do-projeto)
-* [Status:](status)
-* [Funcionalidades:](funcionalidades)
-* [Uso:](uso)
-* [Tecnologias Utilizadas:](tecnologias-utilizadas)
-* [Autores e Agradecimentos](autores-e-agradecimentos)
+* Descrição do Projeto:
+* Status:
+* Funcionalidades:
+* Uso:
+* Tecnologias Utilizadas:
+* Autores e Agradecimento
  
  
 ## Descrição do Projeto:
