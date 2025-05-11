@@ -10,6 +10,13 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_community.chat_message_histories import ChatMessageHistory
+import telebot
+
+
+API_BOT_TOKEN = os.getenv("API_BOT_TOKEN")
+CHAT_ID = os.getenv("CHAT_ID")
+
+
 
 # Este texto define o comportamento do assistente e como ele deve interagir com o usuário.
 template = """Você é um assistente pessoal que ajuda o usuário a gerir sua agenda de horários, lembretes e afazeres diários.
@@ -52,26 +59,45 @@ chain_with_history = RunnableWithMessageHistory(
     history_messages_key="history" # Chave para o histórico de mensagens
 )
 
-# Função para iniciar o agente
-def iniciar_agente():
-    print("Bem-vindo ao assistente de agenda!")
-    while True:
-        pergunta_usuario = input("Você: ")
+
+# Ponto de entrada do script
+if __name__ == "__main__":
+    print("SYSTEM_VERIFY: EXECUTANDO")
+    # iniciar o bot
+    bot = telebot.TeleBot(API_BOT_TOKEN)
+        
+    # Envia uma mensagem log inicial para o chat
+    bot.send_message(
+        CHAT_ID, text="SYSTEM_VERIFY: EXECUTANDO"
+    )
+
+    print("SYSTEM_VERIFY: CONECTADO NO TELEGRAM")
+
+    bot.send_message(
+        CHAT_ID, text="PARA MANDAR MENSAGENS PARA O AGENTE ADICIONE / ANTES DA MENSAGEM"
+    )
+
+    # Define um handler para mensagens de texto
+    @bot.message_handler(content_types=['text'])
+    def handle_message(message):
+        pergunta_usuario = message.text  # Obtém o texto da mensagem do usuário
+        print("Mensagem recebida do usuário:", pergunta_usuario)
 
         # Verifica se o usuário deseja sair
         if pergunta_usuario.lower() in ["sair", "exit"]:
             print("Desligando...")
-            break
+            bot.send_message(CHAT_ID, text="Assistente desligado.")
+            return
 
         # Invoca a cadeia de execução com histórico de mensagens
         resposta = chain_with_history.invoke(
             {'input': pergunta_usuario},
             config={'configurable': {'session_id': 'user123'}}
         )
+        print("Resposta do agente:", resposta)
 
         # Exibe a resposta do assistente
-        print("Assistente: ", resposta.content)
+        bot.send_message(CHAT_ID, text=resposta.content)
 
-# Ponto de entrada do script
-if __name__ == "__main__":
-    iniciar_agente()
+    # Inicia o bot para ouvir mensagens
+    bot.polling()
