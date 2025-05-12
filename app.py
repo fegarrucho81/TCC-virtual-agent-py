@@ -62,7 +62,10 @@ chain_with_history = RunnableWithMessageHistory(
 
 # Ponto de entrada do script
 if __name__ == "__main__":
-    print("SYSTEM_VERIFY: EXECUTANDO")
+
+    
+    print("SYSTEM_VERIFY: EXECUTANDO") # Envia uma mensagem log inicial para o terminal
+    
     # iniciar o bot
     bot = telebot.TeleBot(API_BOT_TOKEN)
         
@@ -71,17 +74,17 @@ if __name__ == "__main__":
         CHAT_ID, text="SYSTEM_VERIFY: EXECUTANDO"
     )
 
-    print("SYSTEM_VERIFY: CONECTADO NO TELEGRAM")
+    print("SYSTEM_VERIFY: CONECTADO NO TELEGRAM") # Envia uma mensagem log inicial para o terminal
 
     bot.send_message(
-        CHAT_ID, text="PARA MANDAR MENSAGENS PARA O AGENTE ADICIONE / ANTES DA MENSAGEM"
+        CHAT_ID, text="PARA MANDAR MENSAGENS PARA O AGENTE ADICIONE / ANTES DA MENSAGEM" # Envia uma mensagem inicial no chat
     )
 
     # Define um handler para mensagens de texto
     @bot.message_handler(content_types=['text'])
     def handle_message(message):
-        pergunta_usuario = message.text  # Obtém o texto da mensagem do usuário
-        print("Mensagem recebida do usuário:", pergunta_usuario)
+        pergunta_usuario = message.text  # Obtém o texto da mensagem do usuário e armazena numa variavel
+        print("Mensagem recebida do usuário:", pergunta_usuario) # Verificaçao se salvou corretamente o texto no terminal
 
         # Verifica se o usuário deseja sair
         if pergunta_usuario.lower() in ["sair", "exit"]:
@@ -96,8 +99,8 @@ if __name__ == "__main__":
         )
         print("Resposta do agente:", resposta)
 
-        # Exibe a resposta do assistente
+        # Exibe a resposta do assistente no chat
         bot.send_message(CHAT_ID, text=resposta.content)
 
-    # Inicia o bot para ouvir mensagens
+    # Inicia o bot para ouvir mensagens e deixa em loop ate ser encerrado
     bot.polling()
