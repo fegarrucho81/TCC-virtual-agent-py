@@ -69,11 +69,6 @@ if __name__ == "__main__":
     # iniciar o bot
     bot = telebot.TeleBot(API_BOT_TOKEN)
         
-    # Envia uma mensagem log inicial para o chat
-    bot.send_message(
-        CHAT_ID, text="SYSTEM_VERIFY: EXECUTANDO"
-    )
-
     print("SYSTEM_VERIFY: CONECTADO NO TELEGRAM") # Envia uma mensagem log inicial para o terminal
 
     bot.send_message(
