@@ -17,10 +17,16 @@ O **Virtual Agent** é parte do TCC que consiste na criação de assistente pess
 
 ## Status:
 - **Em desenvolvimento**
-    0.1: Conexão com a OpenAPI via terminal de comando.
-    0.2: Envio e recebimento de mensagens via Telegram.
+    - 0.1: Conexão com a OpenAPI via terminal de comando.
+    - 0.2: Envio e recebimento de mensagens via Telegram.
 
 ---
+## Tecnologias Ultilizadas:
+1. Python
+2. LangChain
+3. OpenAI API
+4. Telegram API
+5. LLM
 
 ## Funcionalidades:
 - **Recebimento de mensagens via Telegram:** O bot escuta mensagens enviadas pelo usuário em um chat específico.
@@ -31,9 +37,9 @@ O **Virtual Agent** é parte do TCC que consiste na criação de assistente pess
 
 ## Uso:
 Antes de rodar o projeto, no arquivo `.env`, na raiz do projeto, preencha com seus próprios dados:
-    - **OPENAI_API_KEY:** Chave de API da OpenAI (obtenha em https://platform.openai.com/).
-    - **API_BOT_TOKEN:** Token do seu bot do Telegram (obtenha com o BotFather).
-    - **CHAT_ID:** ID do chat onde o bot irá interagir (pode ser seu ID pessoal ou de um grupo).
+- **OPENAI_API_KEY:** Chave de API da OpenAI (obtenha em https://platform.openai.com/).
+- **API_BOT_TOKEN:** Token do seu bot do Telegram (obtenha com o BotFather).
+- **CHAT_ID:** ID do chat onde o bot irá interagir (pode ser seu ID pessoal ou de um grupo).
 
 ### Pré-requisitos:
 - Python 3.11+
