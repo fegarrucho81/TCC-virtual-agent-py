@@ -17,8 +17,8 @@ O **Virtual Agent** é parte do TCC que consiste na criação de assistente pess
 
 ## Status:
 - **Em desenvolvimento**
-    0.1: Conexão com a OpenAPI via terminal de comando.
-    0.2: Envio e recebimento de mensagens via Telegram.
+    - 0.1: Conexão com a OpenAPI via terminal de comando.
+    - 0.2: Envio e recebimento de mensagens via Telegram.
 
 ---
 
