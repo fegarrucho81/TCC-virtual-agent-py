@@ -1,4 +1,4 @@
-# Virtual Agent
+# Virtual Assistant
 
 ## Índice:
 * [Descrição do Projeto](#descrição-do-projeto)
