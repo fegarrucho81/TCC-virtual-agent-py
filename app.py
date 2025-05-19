@@ -79,7 +79,7 @@ if __name__ == "__main__":
     @bot.message_handler(content_types=['text'])
     def handle_message(message):
         pergunta_usuario = message.text  # Obtém o texto da mensagem do usuário e armazena numa variavel
-        print("Mensagem recebida do usuário:", pergunta_usuario) # Verificaçao se salvou corretamente o texto no terminal
+        print("Mensagem recebida do usuário:", pergunta_usuario) # log verificaçao se salvou corretamente 
 
         # Verifica se o usuário deseja sair
         if pergunta_usuario.lower() in ["sair", "exit"]:
