@@ -11,7 +11,7 @@ from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_community.chat_message_histories import ChatMessageHistory
 import telebot
-
+import time
 
 API_BOT_TOKEN = os.getenv("API_BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
@@ -62,40 +62,33 @@ chain_with_history = RunnableWithMessageHistory(
 
 # Ponto de entrada do script
 if __name__ == "__main__":
-
-    
-    print("SYSTEM_VERIFY: EXECUTANDO") # Envia uma mensagem log inicial para o terminal
-    
-    # iniciar o bot
+    print("SYSTEM_VERIFY: EXECUTANDO")
     bot = telebot.TeleBot(API_BOT_TOKEN)
-        
-    print("SYSTEM_VERIFY: CONECTADO NO TELEGRAM") # Envia uma mensagem log inicial para o terminal
+    print("SYSTEM_VERIFY: CONECTADO NO TELEGRAM")
+    bot.send_message(CHAT_ID, text="PARA MANDAR MENSAGENS PARA O AGENTE ADICIONE / ANTES DA MENSAGEM")
 
-    bot.send_message(
-        CHAT_ID, text="PARA MANDAR MENSAGENS PARA O AGENTE ADICIONE / ANTES DA MENSAGEM" # Envia uma mensagem inicial no chat
-    )
-
-    # Define um handler para mensagens de texto
     @bot.message_handler(content_types=['text'])
     def handle_message(message):
-        pergunta_usuario = message.text  # Obtém o texto da mensagem do usuário e armazena numa variavel
-        print("Mensagem recebida do usuário:", pergunta_usuario) # log verificaçao se salvou corretamente 
+        try:
+            pergunta_usuario = message.text
+            print("Mensagem recebida do usuário:", pergunta_usuario)
+            if pergunta_usuario.lower() in ["sair", "exit"]:
+                print("Desligando...")
+                bot.send_message(CHAT_ID, text="Assistente desligado.")
+                return
+            resposta = chain_with_history.invoke(
+                {'input': pergunta_usuario},
+                config={'configurable': {'session_id': 'user123'}}
+            )
+            print("Resposta do agente:", resposta)
+            bot.send_message(CHAT_ID, text=resposta.content)
+        except Exception as e:
+            print(f"Erro no handle_message: {e}")
+            bot.send_message(CHAT_ID, text="Erro ao processar a mensagem, tente novamente.")
 
-        # Verifica se o usuário deseja sair
-        if pergunta_usuario.lower() in ["sair", "exit"]:
-            print("Desligando...")
-            bot.send_message(CHAT_ID, text="Assistente desligado.")
-            return
-
-        # Invoca a cadeia de execução com histórico de mensagens
-        resposta = chain_with_history.invoke(
-            {'input': pergunta_usuario},
-            config={'configurable': {'session_id': 'user123'}}
-        )
-        print("Resposta do agente:", resposta)
-
-        # Exibe a resposta do assistente no chat
-        bot.send_message(CHAT_ID, text=resposta.content)
-
-    # Inicia o bot para ouvir mensagens e deixa em loop ate ser encerrado
-    bot.polling()
+    while True:
+        try:
+            bot.polling(none_stop=True)
+        except Exception as e:
+            print(f"Erro no polling: {e}")
+            time.sleep(5)
