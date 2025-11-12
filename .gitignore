@@ -3,3 +3,4 @@ venv/
 tempCodeRunnerFile.py
 credentials.json
 token.json
+_pycache_/
