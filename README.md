@@ -19,6 +19,13 @@ O **Virtual Agent** é parte do TCC que consiste na criação de assistente pess
 - **Em desenvolvimento**
     - 0.1: Conexão com a OpenAPI via terminal de comando.
     - 0.2: Envio e recebimento de mensagens via Telegram.
+    - 0.3: Uso de Polling e tratamento de erros refinado para evitar crash da aplicação.
+    - 0.4: Conexão com o Google Calendar API para marcar eventos na agenda do usuário.
+    - 0.4.1: Refinamento do título do evento.
+    - 0.4.2: Refinamento do regex, para compreender diferentes padrões de horários.
+    - 0.5: Conexão com a OpenWeather API para ter previsões de tempo em tempo real.
+    - 0.5.1: Refatoração do código para retornar a previsão do tempo em diferentes cidades do mundo.
+    - 0.5.1.2: Refatoração do código.
 
 ---
 ## Tecnologias Ultilizadas:
@@ -26,7 +33,9 @@ O **Virtual Agent** é parte do TCC que consiste na criação de assistente pess
 2. LangChain
 3. OpenAI API
 4. Telegram API
-5. LLM
+5. Google Calendar API
+6. OpeanWeather API
+7. LLM
 
 ## Funcionalidades:
 - **Recebimento de mensagens via Telegram:** O bot escuta mensagens enviadas pelo usuário em um chat específico.
