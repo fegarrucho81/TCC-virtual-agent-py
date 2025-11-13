@@ -40,7 +40,7 @@ def create_event_from_text(texto):
 
     # Regex melhor para capturar data e hora
     padrao_tempo = re.search(
-        r"(hoje|amanhã|depois de amanhã|às\s*\d{1,2}h\d{0,2}|às\s*\d{1,2}:\d{2})",
+        r"(hoje|amanhã|depois de amanhã|(?:às\s*)?\d{1,2}(?:h\d{0,2}|:\d{2})?)",
         texto,
         re.IGNORECASE
     )
