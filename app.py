@@ -2,6 +2,7 @@ import os
 import time
 from dotenv import load_dotenv
 from calendar_app import create_event_from_text  
+from weather import get_weather
 
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -62,6 +63,7 @@ if __name__ == "__main__":
     def handle_message(message):
         try:
             pergunta_usuario = message.text.lower()
+            chat_id = message.chat.id
             print("Mensagem recebida:", pergunta_usuario)
 
             # Verifica se o usuário quer marcar algo na agenda
@@ -69,6 +71,18 @@ if __name__ == "__main__":
                 link = create_event_from_text(pergunta_usuario)
                 bot.send_message(CHAT_ID, f"Reunião criada com sucesso!\n{link}")
                 return
+            
+            # Verifica se o usuário quer saber o clima
+            elif "tempo" in pergunta_usuario.lower() or "clima" in pergunta_usuario.lower():
+                # Tenta extrair o nome da cidade
+                parts = pergunta_usuario.split()
+                if len(parts) > 1:
+                    city = " ".join(parts[1:])
+                    weather_info = get_weather(city)
+                    bot.send_message(chat_id, weather_info)
+                else:
+                    bot.send_message(chat_id, "Por favor, diga o nome da cidade. Exemplo: '/clima São Paulo'")
+                return # evita continuar pro chain
 
             # Caso contrário, continua o fluxo normal do chatbot
             resposta = chain_with_history.invoke(
