@@ -12,12 +12,12 @@ from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_community.chat_message_histories import ChatMessageHistory
 import telebot
 
-# Carrega variáveis do .env
+# carrega variáveis secretas do .env
 load_dotenv()
 API_BOT_TOKEN = os.getenv("API_BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
-# Template base do assistente
+# template base do assistente para saber seu papel
 template = """Você é um assistente pessoal que ajuda o usuário a gerir sua agenda de horários, lembretes e afazeres diários.
 Você faz isso a partir do acesso através de tools a sua agenda.
 
@@ -27,18 +27,18 @@ Histórico de conversa:
 Entrada do usuário:
 {input}"""
 
-# Cria o modelo de prompt
+# cria o modelo de prompt
 prompt = ChatPromptTemplate.from_messages([
     ("system", template),
     MessagesPlaceholder(variable_name="history"),
     ("human", "{input}")
 ])
 
-# Inicializa o modelo de linguagem
+# inicializa o modelo de linguagem
 llm = ChatOpenAI(temperature=0.7, model="gpt-4o-mini")
 chain = prompt | llm
 
-# Histórico de conversas
+# histórico de conversas
 store = {}
 def get_session_history(session_id: str) -> BaseChatMessageHistory:
     if session_id not in store:
@@ -57,9 +57,32 @@ if __name__ == "__main__":
     print("SYSTEM_VERIFY: EXECUTANDO")
     bot = telebot.TeleBot(API_BOT_TOKEN)
     print("SYSTEM_VERIFY: CONECTADO NO TELEGRAM")
-    bot.send_message(CHAT_ID, text="PARA MANDAR MENSAGENS PARA O AGENTE ADICIONE / ANTES DA MENSAGEM")
+    bot.send_message(CHAT_ID, text=(
+        "Olá, sou Mia!\n"
+        "Se precisar de ajuda para gerenciar sua agenda, lembretes ou afazeres, é só me avisar!\n\n"
+        "Digite /help para ver os comandos disponíveis."
+    ))
 
-    # Novo bloco que substitui o antigo:
+    # --- COMANDOS ESPECIAIS ---
+    @bot.message_handler(commands=['start'])
+    def handle_start(message):
+        bot.send_message(message.chat.id, (
+            "Olá, sou Mia!\n"
+            "Se precisar de ajuda para gerenciar sua agenda, lembretes ou afazeres, é só me avisar!\n\n"
+            "Digite /help para ver os comandos disponíveis."
+        ))
+
+    @bot.message_handler(commands=['help'])
+    def handle_help(message):
+        help_text = (
+            "*Comandos disponíveis:*\n\n"
+            "/marcar [nome do evento] [xx/xx/xxxx] / hoje / amanhã às xxh / xx:yy - Criar lembrete na sua agenda\n"
+            "/tempo [cidade] ou [cidade, país] - Previsão do tempo em qualquer lugar do mundo\n"
+            "/noticias [assunto] - 5 notícias relevantes sobre o tema\n"
+        )
+        bot.send_message(message.chat.id, help_text, parse_mode='Markdown')
+
+    # --- HANDLER DE MENSAGENS NORMAIS ---
     @bot.message_handler(content_types=['text'])
     def handle_message(message):
         try:
@@ -67,13 +90,13 @@ if __name__ == "__main__":
             chat_id = message.chat.id
             print("Mensagem recebida:", pergunta_usuario)
 
-            # Verifica se o usuário quer marcar algo na agenda
+            # verifica se o usuário quer marcar algo na agenda
             if "marcar" in pergunta_usuario or "reunião" in pergunta_usuario:
                 link = create_event_from_text(pergunta_usuario)
                 bot.send_message(CHAT_ID, f"Reunião criada com sucesso!\n{link}")
                 return # evita continuar pro chain
             
-            # Verifica se o usuário quer saber o clima
+            # verifica se o usuário quer saber o clima
             elif "tempo" in pergunta_usuario.lower() or "clima" in pergunta_usuario.lower():
                 # Tenta extrair o nome da cidade
                 parts = pergunta_usuario.split()
@@ -85,6 +108,7 @@ if __name__ == "__main__":
                     bot.send_message(chat_id, "Por favor, diga o nome da cidade. Exemplo: '/clima São Paulo'")
                 return # evita continuar pro chain
             
+            # verifica se o usuário quer saber alguma notícia
             elif pergunta_usuario.startswith("/noticias"):
                 parts = pergunta_usuario.split(" ", 1)
                 if len(parts) == 1:
@@ -96,7 +120,7 @@ if __name__ == "__main__":
                 bot.send_message(chat_id, news_result)
                 return # evita continuar pro chain
 
-            # Chat normal
+            # chat normal
             resposta = chain_with_history.invoke(
                 {'input': pergunta_usuario},
                 config={'configurable': {'session_id': 'user123'}}
@@ -107,7 +131,7 @@ if __name__ == "__main__":
             print(f"Erro no handle_message: {e}")
             bot.send_message(CHAT_ID, text="Erro ao processar a mensagem, tente novamente.")
 
-    # Loop principal
+    # loop principal
     while True:
         try:
             bot.polling(none_stop=True)
