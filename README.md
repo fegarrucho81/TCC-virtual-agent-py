@@ -50,17 +50,95 @@ O **Virtual Agent** é parte do TCC que consiste na criação de assistente pess
 ---
 
 ## Uso:
-Antes de rodar o projeto, no arquivo `.env`, na raiz do projeto, preencha com seus próprios dados:
-- **OPENAI_API_KEY:** Chave de API da OpenAI (obtenha em https://platform.openai.com/).
-- **API_BOT_TOKEN:** Token do seu bot do Telegram (obtenha com o BotFather).
-- **CHAT_ID:** ID do chat onde o bot irá interagir (pode ser seu ID pessoal ou de um grupo).
+**Atenção:** Este guia é **apenas para testes locais e desenvolvedores**. Usuários finais não precisam configurar APIs nem arquivos locais.
 
-### Pré-requisitos:
+---
+
+## Tecnologias Utilizadas
 - Python 3.11+
-- Conta e chave de API da OpenAI
-- Token de bot do Telegram
-- ID do chat do Telegram
+- LangChain
+- OpenAI API
+- Telegram API
+- Google Calendar API
+- OpenWeather API
+- GNews API
+- LLM (modelo de linguagem)
 
+---
+
+## Pré-requisitos para desenvolvimento/teste local
+1. Conta e chave de API da OpenAI ([obtenha aqui](https://platform.openai.com/)).
+2. Token do bot do Telegram (via BotFather).
+3. ID do chat do Telegram (pode ser pessoal ou de grupo).
+4. Chave da OpenWeather API.
+5. Chave da GNews API.
+6. Credenciais do Google Calendar (`credentials.json`).
+7. Python 3.11+ instalado ([download](https://www.python.org/downloads/)).
+8. Git instalado ([download](https://git-scm.com/downloads)).
+9. Editor de código (VS Code recomendado) ([download](https://code.visualstudio.com/)).
+
+---
+
+## Passo a passo para testes locais
+
+1. **Criar o bot no Telegram:**
+   - Abra o Telegram Web ou app.
+   - Procure por **BotFather** e inicie conversa.
+   - Digite `/start` e depois `/newbot`.
+   - Escolha um nome para o bot.
+   - Escolha um username (precisa terminar com `bot`).
+   - Copie o **token** que o BotFather fornecer.
+
+2. **Criar grupo de teste (opcional):**
+   - Crie um grupo no Telegram e adicione seu bot.
+   - Pegue o **ID do chat** usando métodos como [@userinfobot](https://t.me/userinfobot).
+
+3. **Obter APIs:**
+   - OpenAI: [https://platform.openai.com/](https://platform.openai.com/)
+   - OpenWeather: [https://openweathermap.org/api](https://openweathermap.org/api)
+   - GNews: [https://gnews.io/](https://gnews.io/)
+   - Google Calendar API: siga [este tutorial](https://developers.google.com/calendar/quickstart/python) para gerar `credentials.json`.
+
+4. **Clonar o repositório e preparar ambiente:**
+   ```bash
+   git clone https://github.com/fegarrucho81/TCC-virtual-agent-py
+   cd TCC-virtual-agent-py
+   python -m venv venv
+   # Ativar venv:
+   # Windows: venv\Scripts\activate
+   # Mac/Linux: source venv/bin/activate
+   pip install -r requirements.txt
+
+5. **Configurar .env na raiz do projeto:**
+   ```bash 
+   ## API Keys
+    OPENAI_API_KEY="sua_openai_api_key"
+    OPENWEATHER_API_KEY="sua_openweather_api_key"
+    GNEWS_API_KEY="sua_gnews_api_key"
+    
+    ## Telegram
+    API_BOT_TOKEN="seu_token_bot"
+    CHAT_ID="id_do_chat"
+
+   ## Google Calendar
+   (coloque seu credentials.json na raiz)
+
+6. **Rodar o bot localmente:**
+   ```bash
+   python app.py
+   
+7. **O bot mandará sua mensagem de saudação:**
+   > "Olá, sou Mia! Se precisar de ajuda para gerenciar sua agenda, lembretes ou afazeres, é só me avisar!
+Digite /help para ver os comandos."
+
+8. **Testar comandos:**
+    ```bash
+    /help → lista de comandos.
+    /marcar [nome] [data/horário] → cria evento na agenda.
+    /tempo [cidade] → previsão do tempo.
+    /noticias [assunto] → 5 notícias relevantes.
+    
+## Este setup é apenas para desenvolvimento local e testes. Para usuários finais, o bot será hospedado na nuvem e não será necessário configurar nada manualmente.
 
 ## Autores e Agradecimentos:
 - Felipe de Oliveira Garrucho
