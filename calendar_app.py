@@ -8,14 +8,14 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
 
-# Escopo Google Calendar
+# escopo do google calendar
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 TIMEZONE = "America/Sao_Paulo"
 TZ = pytz.timezone(TIMEZONE)
 
 
 # -----------------------------------------
-# Autenticação Google (mantém seu fluxo)
+# autenticação com a API do google 
 # -----------------------------------------
 def authenticate_google():
     """
@@ -40,7 +40,7 @@ def authenticate_google():
 
 
 # -----------------------------------------
-# Parser inteligente de data/hora (PT-BR)
+# parser inteligente de data e hora com o padrão pt-br
 # -----------------------------------------
 def parse_datetime(texto_raw: str):
     """
@@ -78,7 +78,7 @@ def parse_datetime(texto_raw: str):
     data_hora = None
     trecho_tempo = ""
 
-    # 1) Se encontrou data explícita -> junta com hora se houver
+    # se encontrou data explícita, junta com hora se houver
     if date_match:
         data_str = date_match.group(0)
 
@@ -100,7 +100,7 @@ def parse_datetime(texto_raw: str):
         else:
             hora_str = "09:00"   # fallback seguro
 
-        # agora fazemos o parse MANUAL, sem usar dateparser
+        # parse manual, sem usar dateparser
         try:
             dia, mes, ano = map(int, data_str.split("/"))
             h, m = map(int, hora_str.split(":"))
@@ -109,7 +109,7 @@ def parse_datetime(texto_raw: str):
         except:
             pass  # se der erro, deixa o dateparser tentar
 
-    # 2) Se não encontrou data mas encontrou hora -> assume hoje (ou amanhã se especificado)
+    # se não encontrou data mas encontrou hora -> assume hoje (ou amanhã se especificado)
     elif time_match:
         raw_time = time_match.group(0)
         tm = raw_time.replace("h", ":").strip()
@@ -132,7 +132,7 @@ def parse_datetime(texto_raw: str):
         except Exception:
             data_hora = None
 
-    # 3) Se encontrou palavras relativas (hoje/amanhã/depois) mas sem hora -> tenta juntar com hora se houver
+    # se encontrou palavras relativas (hoje/amanhã/depois) mas sem hora, tenta juntar com hora se houver
     if not data_hora and not trecho_tempo:
         if dia_hoje:
             trecho_tempo = "hoje"
@@ -147,13 +147,13 @@ def parse_datetime(texto_raw: str):
             if time_match:
                 trecho_tempo += " " + time_match.group(0)
 
-    # 4) fallback: tenta pegar qualquer trecho que pareça data/hora
+    # fallback: tenta pegar qualquer trecho que pareça data/hora
     if not data_hora and not trecho_tempo:
         m = re.search(r"(hoje|amanh[aã]|depois de amanh[aã]|\d{1,2}:\d{2}|\d{1,2}h\d{0,2}|\d{1,2}\s+de\s+\w+|\d{1,2}/\d{1,2}(?:/\d{2,4})?)", texto)
         if m:
             trecho_tempo = m.group(0)
 
-    # 5) usa dateparser se ainda não tivermos data_hora construída
+    # usa dateparser se ainda não tivermos data_hora construída
     if data_hora is None:
         if not trecho_tempo:
             return None
@@ -172,7 +172,7 @@ def parse_datetime(texto_raw: str):
         except Exception:
             data_hora = None
 
-    # 6) valida
+    # valida
     if not data_hora:
         return None
 
@@ -180,7 +180,7 @@ def parse_datetime(texto_raw: str):
     if data_hora.tzinfo is None:
         data_hora = TZ.localize(data_hora)
 
-    # 7) Se a data ficar no passado e usuário não falou "hoje", tenta avançar 1 dia
+    # se a data ficar no passado e usuário não falou "hoje", tenta avançar 1 dia
     now = datetime.datetime.now(TZ)
     if data_hora < now and not dia_hoje:
         data_hora = data_hora + datetime.timedelta(days=1)
@@ -189,7 +189,7 @@ def parse_datetime(texto_raw: str):
 
 
 # -----------------------------------------
-# Função principal: cria o evento
+# criar o evento
 # -----------------------------------------
 def create_event_from_text(texto):
     """
@@ -208,7 +208,7 @@ def create_event_from_text(texto):
     start_time = dt
     end_time = start_time + datetime.timedelta(minutes=30)
 
-    # gerar título limpo: remove tokens comuns
+    # gerar título limpo
     texto_limpo = re.sub(r"[\/,.:;@#\n]", " ", texto).strip()
     palavras = texto_limpo.split()
     palavras_ignoradas = {
