@@ -32,7 +32,7 @@ O **Virtual Agent** é parte do TCC que consiste na criação de assistente pess
 
 ---
 ## Tecnologias Ultilizadas:
-1. Python
+1. Python 3.11+
 2. LangChain
 3. OpenAI API (Modelo de Linguagem - LLM)
 4. Telegram API
@@ -70,12 +70,13 @@ O **Virtual Agent** é parte do TCC que consiste na criação de assistente pess
 1. Conta e chave de API da OpenAI ([obtenha aqui](https://platform.openai.com/)).
 2. Token do bot do Telegram (via BotFather).
 3. ID do chat do Telegram (pode ser pessoal ou de grupo).
-4. Chave da OpenWeather API.
-5. Chave da GNews API.
-6. Credenciais do Google Calendar (`credentials.json`).
-7. Python 3.11+ instalado ([download](https://www.python.org/downloads/)).
-8. Git instalado ([download](https://git-scm.com/downloads)).
-9. Editor de código (VS Code recomendado) ([download](https://code.visualstudio.com/)).
+4. Chave da OpenWeather API. ([obtenha aqui](https://openweathermap.org/appid)).
+5. Chave da GNews API. ([obtenha aqui](https://gnews.io/)).
+6. Chave do Google Calendar ([obtenha aqui](https://cloud.google.com/apis))
+7. Credenciais do Google Calendar (`credentials.json`).
+8. Python 3.11+ instalado ([download](https://www.python.org/downloads/)).
+9. Git instalado ([download](https://git-scm.com/downloads)).
+10. Editor de código (VS Code recomendado) ([download](https://code.visualstudio.com/)).
 
 ---
 
@@ -137,8 +138,12 @@ Digite /help para ver os comandos."
     /marcar [nome] [data/horário] → cria evento na agenda.
     /tempo [cidade] → previsão do tempo.
     /noticias [assunto] → 5 notícias relevantes.
-    
+
+---
+
 ## Este setup é apenas para desenvolvimento local e testes. Para usuários finais, o bot será hospedado na nuvem e não será necessário configurar nada manualmente.
+
+---
 
 ## Autores e Agradecimentos:
 - Felipe de Oliveira Garrucho
