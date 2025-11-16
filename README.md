@@ -25,9 +25,10 @@ O **Virtual Agent** é parte do TCC que consiste na criação de assistente pess
     - 0.0.4.2: Refinamento do regex, para compreender diferentes padrões de horários.
     - 0.0.5: Conexão com a OpenWeather API para ter previsões de tempo em tempo real.
     - 0.0.5.1: Refatoração do código para retornar a previsão do tempo em diferentes cidades do mundo.
-    - 0.0.5.1.2: Refatoração do código.
-    - 0.0.6: Integração com a GNews API para retorno de notícias relevantes sobre determinado tema.
-    - 0.1.0: Versão estável de testes pronta para deploy, com bot 100% operante no Google Agenda.
+    - 0.0.6: Refatoração do código seguindo boas práticas de desenvolvimento e POO.
+    - 0.0.7: Integração com a GNews API para retorno de notícias relevantes sobre determinado tema.
+    - 0.1.0: Versão estável de testes, pronta para deploy, com bot 100% operante no Google Agenda.
+    - 0.1.1: Melhorada a mensagem de boas-vindas, e adicionado um /help para auxiliar e guiar o usuário.
 
 ---
 ## Tecnologias Ultilizadas:
