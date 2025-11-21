@@ -88,6 +88,24 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Erro no /listar: {e}")
             bot.send_message(message.chat.id, "Erro ao listar eventos.")
+            
+    @bot.message_handler(commands=['remover'])
+    def handle_remover_nome(message):
+        try:
+            user_query = message.text.replace("/remover", "").strip()
+
+            if not user_query:
+                bot.send_message(message.chat.id, "Use assim:\n/remover nome_do_evento")
+                return
+            
+            from calendar_app import remover_evento_por_nome
+            resposta = remover_evento_por_nome(user_query)
+
+            bot.send_message(message.chat.id, resposta)
+
+        except Exception as e:
+            print(f"Erro no /remover: {e}")
+            bot.send_message(message.chat.id, "Erro ao tentar remover o evento.")
     
     @bot.message_handler(commands=['help'])
     def handle_help(message):
@@ -97,6 +115,7 @@ if __name__ == "__main__":
             "/tempo [cidade] ou [cidade, país] - Previsão do tempo em qualquer lugar do mundo\n"
             "/noticias [assunto] - 5 notícias relevantes sobre o tema\n"
             "/listar [dia ou xx/xx/xxxx] - Mostrar eventos de tal dia\n"
+            "/remover [nome do evento] - Remove o evento da sua agenda\n"
         )
         bot.send_message(message.chat.id, help_text, parse_mode='Markdown')
 
