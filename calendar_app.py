@@ -208,3 +208,98 @@ def create_event_from_text(texto):
 
     print(f"Evento criado: {created.get('htmlLink')} — start: {start_time}")
     return created.get("htmlLink")
+
+def listar_eventos_do_dia(texto):
+    service = authenticate_google()
+
+    # tenta parsear data usando a mesma função usada para criar eventos
+    dt = parse_datetime(texto)
+    if dt is None:
+        return "Não consegui entender a data. Tente: 'hoje', 'amanhã' ou '29/11/2025'."
+
+    # início do dia
+    start = dt.replace(hour=0, minute=0, second=0, microsecond=0)
+    # fim do dia
+    end = dt.replace(hour=23, minute=59, second=59, microsecond=0)
+
+    # query no calendar
+    events_result = service.events().list(
+        calendarId="primary",
+        timeMin=start.isoformat(),
+        timeMax=end.isoformat(),
+        singleEvents=True,
+        orderBy="startTime"
+    ).execute()
+
+    events = events_result.get("items", [])
+
+    # nenhuma reunião encontrada
+    if not events:
+        return f"Você não tem eventos em {dt.strftime('%d/%m/%Y')}."
+
+    # monta resposta
+    resposta = f"Eventos em {dt.strftime('%d/%m/%Y')}:\n\n"
+    for ev in events:
+        inicio = ev["start"].get("dateTime", ev["start"].get("date"))
+        inicio_dt = dateparser.parse(inicio)
+        hora_formatada = inicio_dt.strftime("%H:%M")
+        resposta += f"- {ev.get('summary', 'Sem título')} às {hora_formatada}\n"
+
+    return resposta
+
+def remover_evento_por_nome(texto):
+    """Remove o evento mais próximo cujo título contenha o nome informado."""
+
+    service = authenticate_google()
+
+    # limpa o texto
+    texto_limpo = re.sub(r"[\/,.:;@#\n]", " ", texto).strip()
+    palavras = texto_limpo.split()
+
+    palavras_ignoradas = {"remover", "remova", "delete", "excluir", "tirar", "o", "a", "do", "da", "de", "para"}
+    titulo_tokens = [p for p in palavras if p.lower() not in palavras_ignoradas]
+
+    if not titulo_tokens:
+        return "Diga o nome do evento. Ex: /remover consulta"
+
+    termo = " ".join(titulo_tokens).strip().lower()
+
+    # busca TODOS eventos futuros e passados (últimos 30 dias)
+    now = datetime.datetime.now(TZ)
+    past = now - datetime.timedelta(days=30)
+
+    events_result = service.events().list(
+        calendarId="primary",
+        timeMin=past.isoformat(),
+        timeMax=(now + datetime.timedelta(days=365)).isoformat(),
+        singleEvents=True,
+        orderBy="startTime"
+    ).execute()
+
+    events = events_result.get("items", [])
+
+    # filtra por nome
+    candidatos = []
+    for ev in events:
+        summary = ev.get("summary", "").lower().strip()
+        if termo in summary:
+            # registra evento com data já convertida
+            inicio = ev["start"].get("dateTime", ev["start"].get("date"))
+            dt_inicio = dateparser.parse(inicio)
+            candidatos.append((ev, dt_inicio))
+
+    if not candidatos:
+        return "Não encontrei nenhum evento com esse nome."
+
+    # ordena pelos mais próximos
+    candidatos.sort(key=lambda x: abs((x[1] - now).total_seconds()))
+
+    evento_alvo = candidatos[0][0]  # pega o mais próximo no tempo
+
+    # remove
+    service.events().delete(
+        calendarId="primary",
+        eventId=evento_alvo["id"]
+    ).execute()
+
+    return f"Evento '{evento_alvo.get('summary')}' removido com sucesso!"
