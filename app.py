@@ -72,6 +72,23 @@ if __name__ == "__main__":
             "Digite /help para ver os comandos disponíveis."
         ))
 
+    @bot.message_handler(commands=['listar'])
+    def handle_listar(message):
+        try:
+            user_query = message.text.replace("/listar", "").strip().lower()
+            
+            if not user_query:
+                bot.send_message(message.chat.id, "Use assim:\n/listar hoje\n/listar amanhã\n/listar 29/11/2025")
+                return
+            
+            from calendar_app import listar_eventos_do_dia
+            resultado = listar_eventos_do_dia(user_query)
+            bot.send_message(message.chat.id, resultado)
+    
+        except Exception as e:
+            print(f"Erro no /listar: {e}")
+            bot.send_message(message.chat.id, "Erro ao listar eventos.")
+    
     @bot.message_handler(commands=['help'])
     def handle_help(message):
         help_text = (
@@ -79,6 +96,7 @@ if __name__ == "__main__":
             "/marcar [nome do evento] [xx/xx/xxxx] / hoje / amanhã às xxh / xx:yy - Criar lembrete na sua agenda\n"
             "/tempo [cidade] ou [cidade, país] - Previsão do tempo em qualquer lugar do mundo\n"
             "/noticias [assunto] - 5 notícias relevantes sobre o tema\n"
+            "/listar [dia ou xx/xx/xxxx] - Mostrar eventos de tal dia\n"
         )
         bot.send_message(message.chat.id, help_text, parse_mode='Markdown')
 
