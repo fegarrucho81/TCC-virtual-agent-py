@@ -246,3 +246,60 @@ def listar_eventos_do_dia(texto):
         resposta += f"- {ev.get('summary', 'Sem título')} às {hora_formatada}\n"
 
     return resposta
+
+def remover_evento_por_nome(texto):
+    """Remove o evento mais próximo cujo título contenha o nome informado."""
+
+    service = authenticate_google()
+
+    # limpa o texto
+    texto_limpo = re.sub(r"[\/,.:;@#\n]", " ", texto).strip()
+    palavras = texto_limpo.split()
+
+    palavras_ignoradas = {"remover", "remova", "delete", "excluir", "tirar", "o", "a", "do", "da", "de", "para"}
+    titulo_tokens = [p for p in palavras if p.lower() not in palavras_ignoradas]
+
+    if not titulo_tokens:
+        return "Diga o nome do evento. Ex: /remover consulta"
+
+    termo = " ".join(titulo_tokens).strip().lower()
+
+    # busca TODOS eventos futuros e passados (últimos 30 dias)
+    now = datetime.datetime.now(TZ)
+    past = now - datetime.timedelta(days=30)
+
+    events_result = service.events().list(
+        calendarId="primary",
+        timeMin=past.isoformat(),
+        timeMax=(now + datetime.timedelta(days=365)).isoformat(),
+        singleEvents=True,
+        orderBy="startTime"
+    ).execute()
+
+    events = events_result.get("items", [])
+
+    # filtra por nome
+    candidatos = []
+    for ev in events:
+        summary = ev.get("summary", "").lower().strip()
+        if termo in summary:
+            # registra evento com data já convertida
+            inicio = ev["start"].get("dateTime", ev["start"].get("date"))
+            dt_inicio = dateparser.parse(inicio)
+            candidatos.append((ev, dt_inicio))
+
+    if not candidatos:
+        return "Não encontrei nenhum evento com esse nome."
+
+    # ordena pelos mais próximos
+    candidatos.sort(key=lambda x: abs((x[1] - now).total_seconds()))
+
+    evento_alvo = candidatos[0][0]  # pega o mais próximo no tempo
+
+    # remove
+    service.events().delete(
+        calendarId="primary",
+        eventId=evento_alvo["id"]
+    ).execute()
+
+    return f"Evento '{evento_alvo.get('summary')}' removido com sucesso!"
