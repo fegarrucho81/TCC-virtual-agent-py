@@ -208,3 +208,41 @@ def create_event_from_text(texto):
 
     print(f"Evento criado: {created.get('htmlLink')} — start: {start_time}")
     return created.get("htmlLink")
+
+def listar_eventos_do_dia(texto):
+    service = authenticate_google()
+
+    # tenta parsear data usando a mesma função usada para criar eventos
+    dt = parse_datetime(texto)
+    if dt is None:
+        return "Não consegui entender a data. Tente: 'hoje', 'amanhã' ou '29/11/2025'."
+
+    # início do dia
+    start = dt.replace(hour=0, minute=0, second=0, microsecond=0)
+    # fim do dia
+    end = dt.replace(hour=23, minute=59, second=59, microsecond=0)
+
+    # query no calendar
+    events_result = service.events().list(
+        calendarId="primary",
+        timeMin=start.isoformat(),
+        timeMax=end.isoformat(),
+        singleEvents=True,
+        orderBy="startTime"
+    ).execute()
+
+    events = events_result.get("items", [])
+
+    # nenhuma reunião encontrada
+    if not events:
+        return f"Você não tem eventos em {dt.strftime('%d/%m/%Y')}."
+
+    # monta resposta
+    resposta = f"Eventos em {dt.strftime('%d/%m/%Y')}:\n\n"
+    for ev in events:
+        inicio = ev["start"].get("dateTime", ev["start"].get("date"))
+        inicio_dt = dateparser.parse(inicio)
+        hora_formatada = inicio_dt.strftime("%H:%M")
+        resposta += f"- {ev.get('summary', 'Sem título')} às {hora_formatada}\n"
+
+    return resposta
